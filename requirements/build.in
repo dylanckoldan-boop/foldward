@@ -2,4 +2,4 @@
 #   uv pip compile requirements/build.in --python-version 3.12 --python-platform x86_64-manylinux_2_39 --generate-hashes -o requirements/build.lock
 build>=1.2
 setuptools>=68
-wheel>=0.43
+wheel>=0.48.0
