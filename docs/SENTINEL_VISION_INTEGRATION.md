@@ -61,20 +61,36 @@ to standalone; the host lends its window, tray and notifications.
 ### Installing the plugin (Windows)
 
 The installed Windows app loads plugins only from an administrator-only folder and
-checks their permissions before loading. Install a **tagged release** from an
-administrator terminal, with a Python matching the app (3.12):
+checks their permissions before loading. Foldward's pages need **sentinel-vision
+0.5.4 or newer** there: older installed builds leave out part of the `cryptography`
+package that Foldward uses for its keys, so Foldward is allowed but never appears
+(INT-N04).
+
+From an administrator PowerShell, with Python 3.12, the version the app is built
+with (`py install 3.12` if it's missing), install the release file, whose checksum
+pip checks, then reset the permissions of what pip wrote:
 
 ```
-py -3.12 -m pip install --target "C:\Program Files\Sentinel Vision\plugins\foldward" "foldward @ git+https://github.com/dylanckoldan-boop/Foldward@v0.2.2"
+py -3.12 -m pip install --target "C:\Program Files\Sentinel Vision\plugins\foldward" "foldward @ https://github.com/dylanckoldan-boop/foldward/releases/download/v0.2.2/foldward-0.2.2-py3-none-any.whl#sha256=b80ce6513163e89e5f93482efce06db43b83126fae8e51baa2f4a56044182f72"
+icacls "C:\Program Files\Sentinel Vision\plugins\foldward" /setowner Administrators /T /C /Q
+icacls "C:\Program Files\Sentinel Vision\plugins\foldward" /reset /T /C /Q
 ```
 
-Install a tag from the repository, never the moving `main` branch and never a
+The reset is needed because Python 3.12.4 and newer leave the files pip moves into
+the folder readable only by administrators, and sentinel-vision, which runs with
+your rights, refuses a plugin it can't check (INT-N05). With Git installed,
+`"foldward @ git+https://github.com/dylanckoldan-boop/Foldward@v0.2.2"` installs the
+same release.
+
+Install a release from the repository, never the moving `main` branch and never a
 package from PyPI: `agent-guard` there is an unrelated project, and `foldward`
-isn't claimed there by this project. sentinel-vision asks for a one-time
-approval before loading a new or changed plugin; `sentinel-vision-cli plugins`
-lists what was found and why anything was refused. After upgrading from Agent
-Guard, remove the old `plugins\agent-guard` folder (sentinel-vision 0.5.2 skips it
-when Foldward is installed, and says so).
+isn't claimed there by this project. `sentinel-vision-cli plugins`, run in a normal
+PowerShell, should then list Foldward as waiting for approval, and says why
+anything was refused. Quit sentinel-vision from its tray icon (closing the window
+only hides it), open it again and allow Foldward: Windows asks for administrator
+permission, then answer **Yes** to "Reduce Sentinel Vision protection?". After
+upgrading from Agent Guard, remove the old `plugins\agent-guard` folder
+(sentinel-vision 0.5.2 skips it when Foldward is installed, and says so).
 
 ## 2. Handing a contained agent's file to the vault
 

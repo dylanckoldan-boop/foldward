@@ -324,8 +324,10 @@ def test_install_commands_never_fetch_the_unrelated_pypi_package():
             if 'pip install' not in line:
                 continue
             rest = line.split('pip install', 1)[1]
-            if '@ git+https://github.com/dylanckoldan-boop/Foldward@v' in rest:
-                continue  # a direct reference to a tagged release of this repository, never a PyPI name
+            if '@ git+https://github.com/dylanckoldan-boop/Foldward@v' in rest or (
+                '@ https://github.com/dylanckoldan-boop/foldward/releases/download/v' in rest and '#sha256=' in rest
+            ):
+                continue  # a tagged release, or a release file with its checksum, of this repository: never PyPI
             names = {_requirement_name(t) for t in rest.split()}
             if names & {'foldward', 'agent-guard', 'agent_guard'}:
                 offenders.append(f.name + ': ' + line.strip())
